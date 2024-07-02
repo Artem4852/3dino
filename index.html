@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <title>Dino game</title>
+</head>
+<body>
+    <a-scene>
+        <a-assets>
+            <a-asset-item id="cactus" src="./cactus.obj"></a-asset-item>
+        </a-assets>
+
+        <a-entity id="camera" camera look-controls custom-wasd-controls position="0 1 0"></a-entity>
+
+        <a-obj-model class="cactus" src="#cactus" color="green" position="0 0 -10" rotation="0 0 0"></a-obj-model>
+
+        <a-plane color="yellow" width="5" height="100" rotation="-90 0 0" position="0 -1 0"></a-plane>
+    </a-scene>
+
+    <script>
+        AFRAME.registerComponent('custom-wasd-controls', {
+            init: function () {
+                this.el.addEventListener('keydown', (event) => {
+                    if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
+                        event.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
