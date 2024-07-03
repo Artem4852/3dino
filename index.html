@@ -30,25 +30,22 @@
             <a-asset-item id="floor_4_mtl" src="assets/floor_4.mtl"></a-asset-item>
         </a-assets>
 
-        <a-box position="0 3 20" color="blue"></a-box>
-        <a-box position="0 3 -50"  color="blue"></a-box>
-        <a-box position="0 3 50"  color="blue"></a-box>
-        <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity>
-        <!-- <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 20"></a-entity> -->
+        <!-- <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity> -->
+        <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 20"></a-entity>
 
         <!-- <a-obj-model class="floor" get-dimensions src="#floor_1_obj" mtl="#floor_1_mtl" position="0 -1 0" rotation="0 0 0" scale="0.7 0.7 0.7"></a-obj-model> -->
     </a-scene>
 
     <script>
-        // AFRAME.registerComponent('custom-wasd-controls', {
-        //     init: function () {
-        //         this.el.addEventListener('keydown', (event) => {
-        //             if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
-        //                 event.preventDefault();
-        //             }
-        //         });
-        //     }
-        // });
+        AFRAME.registerComponent('custom-wasd-controls', {
+            init: function () {
+                this.el.addEventListener('keydown', (event) => {
+                    if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
+                        event.preventDefault();
+                    }
+                });
+            }
+        });
 
         // The best way I could think of to get dimensions of the floor...
         AFRAME.registerComponent('get-dimensions', {
