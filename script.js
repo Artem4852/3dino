@@ -27,7 +27,7 @@ function jump() {
     if (isJumping) return;
     isJumping = true;
     const startPosition = parseFloat(camera.getAttribute('position').y);
-    const peakPosition = startPosition + 2;
+    const peakPosition = startPosition + 6;
     let ascending = true;
     let alpha = 0;
 
@@ -74,10 +74,10 @@ let isJumping = false;
 setInterval(() => {
     if (isJumping) return;
 
-    if (shiftPressed && camera.getAttribute('position').y > 0.3) {
-        camera.setAttribute('position', '0 0 0');
-    } else if (!shiftPressed && camera.getAttribute('position').y < 0.7) {
-        camera.setAttribute('position', '0 1 0');
+    if (shiftPressed && camera.getAttribute('position').y > 1.3) {
+        camera.setAttribute('position', '0 1 20');
+    } else if (!shiftPressed && camera.getAttribute('position').y < 2.7) {
+        camera.setAttribute('position', '0 3 20');
     }
 
 
@@ -104,14 +104,47 @@ document.addEventListener('keyup', (e) => {
     }
 });
 
+cacti = ["cactus_big_1", "cactus_big_2", "cactus_big_3", "cactus_small_1", "cactus_small_2"]
 
-cactus = document.getElementsByClassName("cactus")[0];
-cactus.setAttribute('position', '0 0 -10');
+function spawnCactus() {
+    const cactus = document.createElement('a-obj-model');
+    choice = "#" + cacti[Math.floor(Math.random() * cacti.length)];
+    console.log(choice);
+    cactus.setAttribute('src', choice + '_obj');
+    cactus.setAttribute('mtl', choice + '_mtl');
+    cactus.setAttribute('scale', '0.7 0.7 0.7');
+    cactus.setAttribute('position', '0 -1 -20');
+    cactus.setAttribute('class', 'move cactus');
+    document.getElementById('scene').appendChild(cactus);
+}
+
+for (let i = 0; i < 10; i++) {
+    setTimeout(() => {
+        spawnCactus();
+    }, 1000 * i);
+}
+
+function moveCacti() {
+    const cacti = document.getElementsByClassName('cactus');
+    for (let i = 0; i < cacti.length; i++) {
+        const positionAttr = cacti[i].getAttribute('position');
+        const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+        cacti[i].setAttribute('position', {x: 0, y: -1, z: position.z + 0.1});
+        if (position.z > 50) {
+            cacti[i].remove();
+            spawnCactus();
+        }
+    }
+}
 
 setInterval(() => {
-    cactus.setAttribute('position', {
-        x: cactus.getAttribute('position').x,
-        y: cactus.getAttribute('position').y,
-        z: cactus.getAttribute('position').z + 0.02
-    });
+    moveCacti();
+    // toMove = document.getElementsByClassName("move");
+    // for (let i = 0; i < toMove.length; i++) {
+    //     toMove[i].setAttribute('position', {
+    //         x: toMove[i].getAttribute('position').x,
+    //         y: toMove[i].getAttribute('position').y,
+    //         z: toMove[i].getAttribute('position').z + 0.1
+    //     });
+    // }
 }, 10);

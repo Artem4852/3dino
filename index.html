@@ -8,16 +8,33 @@
     <title>Dino game</title>
 </head>
 <body>
-    <a-scene>
+    <a-scene id="scene">
         <a-assets>
-            <a-asset-item id="cactus" src="./cactus_big_2.obj"></a-asset-item>
+            <a-asset-item id="cactus_small_1_obj" src="assets/cactus_small_1.obj"></a-asset-item>
+            <a-asset-item id="cactus_small_1_mtl" src="assets/cactus_small_1.mtl"></a-asset-item>
+            <a-asset-item id="cactus_small_2_obj" src="assets/cactus_small_2.obj"></a-asset-item>
+            <a-asset-item id="cactus_small_2_mtl" src="assets/cactus_small_2.mtl"></a-asset-item>
+            <a-asset-item id="cactus_big_1_obj" src="assets/cactus_big_1.obj"></a-asset-item>
+            <a-asset-item id="cactus_big_1_mtl" src="assets/cactus_big_1.mtl"></a-asset-item>
+            <a-asset-item id="cactus_big_2_obj" src="assets/cactus_big_2.obj"></a-asset-item>
+            <a-asset-item id="cactus_big_2_mtl" src="assets/cactus_big_2.mtl"></a-asset-item>
+            <a-asset-item id="cactus_big_3_obj" src="assets/cactus_big_3.obj"></a-asset-item>
+            <a-asset-item id="cactus_big_3_mtl" src="assets/cactus_big_3.mtl"></a-asset-item>
+            <a-asset-item id="floor_1_obj" src="assets/floor_1.obj"></a-asset-item>
+            <a-asset-item id="floor_1_mtl" src="assets/floor_1.mtl"></a-asset-item>
+            <a-asset-item id="floor_2_obj" src="assets/floor_2.obj"></a-asset-item>
+            <a-asset-item id="floor_2_mtl" src="assets/floor_2.mtl"></a-asset-item>
+            <a-asset-item id="floor_3_obj" src="assets/floor_3.obj"></a-asset-item>
+            <a-asset-item id="floor_3_mtl" src="assets/floor_3.mtl"></a-asset-item>
+            <a-asset-item id="floor_4_obj" src="assets/floor_4.obj"></a-asset-item>
+            <a-asset-item id="floor_4_mtl" src="assets/floor_4.mtl"></a-asset-item>
         </a-assets>
 
-        <a-entity id="camera" camera look-controls custom-wasd-controls position="0 1 0"></a-entity>
+        <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 20"></a-entity>
 
-        <a-obj-model class="cactus" src="#cactus" color="green" position="0 0 -10" rotation="0 0 0"></a-obj-model>
+        <a-obj-model class="move" src="#floor_1_obj" mtl="#floor_1_mtl" position="0 -1 0" rotation="0 0 0"></a-obj-model>
 
-        <a-plane color="yellow" width="5" height="100" rotation="-90 0 0" position="0 -1 0"></a-plane>
+        <!-- <a-plane color="yellow" width="5" height="100" rotation="-90 0 0" position="0 -1 0"></a-plane> -->
     </a-scene>
 
     <script>
