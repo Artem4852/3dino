@@ -30,19 +30,40 @@
             <a-asset-item id="floor_4_mtl" src="assets/floor_4.mtl"></a-asset-item>
         </a-assets>
 
-        <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 20"></a-entity>
+        <a-box position="0 3 20" color="blue"></a-box>
+        <a-box position="0 3 -50"  color="blue"></a-box>
+        <a-box position="0 3 50"  color="blue"></a-box>
+        <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity>
+        <!-- <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 20"></a-entity> -->
 
-        <a-obj-model class="move" src="#floor_1_obj" mtl="#floor_1_mtl" position="0 -1 0" rotation="0 0 0"></a-obj-model>
-
-        <!-- <a-plane color="yellow" width="5" height="100" rotation="-90 0 0" position="0 -1 0"></a-plane> -->
+        <!-- <a-obj-model class="floor" get-dimensions src="#floor_1_obj" mtl="#floor_1_mtl" position="0 -1 0" rotation="0 0 0" scale="0.7 0.7 0.7"></a-obj-model> -->
     </a-scene>
 
     <script>
-        AFRAME.registerComponent('custom-wasd-controls', {
+        // AFRAME.registerComponent('custom-wasd-controls', {
+        //     init: function () {
+        //         this.el.addEventListener('keydown', (event) => {
+        //             if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
+        //                 event.preventDefault();
+        //             }
+        //         });
+        //     }
+        // });
+
+        // The best way I could think of to get dimensions of the floor...
+        AFRAME.registerComponent('get-dimensions', {
             init: function () {
-                this.el.addEventListener('keydown', (event) => {
-                    if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
-                        event.preventDefault();
+                this.el.addEventListener('model-loaded', () => {
+                    const mesh = this.el.getObject3D('mesh');
+                    if (mesh) {
+                        const box = new THREE.Box3().setFromObject(mesh);
+                        const size = box.getSize(new THREE.Vector3());
+
+                        console.log('Dimensions:', size);
+
+                        const position = this.el.object3D.position;
+                        const endX = position.x + size.x * this.el.object3D.scale.x / 2;
+                        console.log('End X position:', endX);
                     }
                 });
             }

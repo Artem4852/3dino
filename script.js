@@ -67,84 +67,103 @@ function jump() {
     animateJump();
 }
 
-const camera = document.getElementById('camera');
-let movingUp = true;
-let shiftPressed = false;
-let isJumping = false;
-setInterval(() => {
-    if (isJumping) return;
+// const camera = document.getElementById('camera');
+// let movingUp = true;
+// let shiftPressed = false;
+// let isJumping = false;
+// setInterval(() => {
+//     if (isJumping) return;
 
-    if (shiftPressed && camera.getAttribute('position').y > 1.3) {
-        camera.setAttribute('position', '0 1 20');
-    } else if (!shiftPressed && camera.getAttribute('position').y < 2.7) {
-        camera.setAttribute('position', '0 3 20');
-    }
+//     if (shiftPressed && camera.getAttribute('position').y > 1.3) {
+//         camera.setAttribute('position', '0 1 20');
+//     } else if (!shiftPressed && camera.getAttribute('position').y < 2.7) {
+//         camera.setAttribute('position', '0 3 20');
+//     }
 
 
-    const currentPosition = parseFloat(camera.getAttribute('position').y);
-    if (movingUp) {
-        updateCameraPosition(currentPosition + 0.2);
-    } else {
-        updateCameraPosition(currentPosition - 0.2);
-    }
-    movingUp = !movingUp;
-}, 150);
+//     const currentPosition = parseFloat(camera.getAttribute('position').y);
+//     if (movingUp) {
+//         updateCameraPosition(currentPosition + 0.2);
+//     } else {
+//         updateCameraPosition(currentPosition - 0.2);
+//     }
+//     movingUp = !movingUp;
+// }, 150);
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Shift') {
-        shiftPressed = true;
-    } else if (e.key === 'w' && !shiftPressed) {
-        jump();
-    }
-});
+// document.addEventListener('keydown', (e) => {
+//     if (e.key === 'Shift') {
+//         shiftPressed = true;
+//     } else if (e.key === 'w' && !shiftPressed) {
+//         jump();
+//     }
+// });
 
-document.addEventListener('keyup', (e) => {
-    if (e.key === 'Shift') {
-        shiftPressed = false;
-    }
-});
+// document.addEventListener('keyup', (e) => {
+//     if (e.key === 'Shift') {
+//         shiftPressed = false;
+//     }
+// });
 
-cacti = ["cactus_big_1", "cactus_big_2", "cactus_big_3", "cactus_small_1", "cactus_small_2"]
+const obstacle_names = ["cactus_big_1", "cactus_big_2", "cactus_big_3", "cactus_small_1", "cactus_small_2"]
 
-function spawnCactus() {
-    const cactus = document.createElement('a-obj-model');
-    choice = "#" + cacti[Math.floor(Math.random() * cacti.length)];
-    console.log(choice);
-    cactus.setAttribute('src', choice + '_obj');
-    cactus.setAttribute('mtl', choice + '_mtl');
-    cactus.setAttribute('scale', '0.7 0.7 0.7');
-    cactus.setAttribute('position', '0 -1 -20');
-    cactus.setAttribute('class', 'move cactus');
-    document.getElementById('scene').appendChild(cactus);
+function spawnObstacle() {
+    const obstcale = document.createElement('a-obj-model');
+    choice = "#" + obstacle_names[Math.floor(Math.random() * obstacle_names.length)];
+    obstcale.setAttribute('src', choice + '_obj');
+    obstcale.setAttribute('mtl', choice + '_mtl');
+    obstcale.setAttribute('scale', '0.7 0.7 0.7');
+    obstcale.setAttribute('position', {x: 0, y: -1, z: -50});
+    obstcale.setAttribute('class', 'obstacle');
+    document.getElementById('scene').appendChild(obstcale);
 }
 
-for (let i = 0; i < 10; i++) {
-    setTimeout(() => {
-        spawnCactus();
-    }, 1000 * i);
+function spawnFloor() {
+    const floor = document.createElement('a-obj-model');
+    choice = "#floor_" + (Math.floor(Math.random() * 3) + 1);
+    floor.setAttribute('src', choice + '_obj');
+    floor.setAttribute('mtl', choice + '_mtl');
+    floor.setAttribute('scale', '0.7 0.7 0.7');
+    floor.setAttribute('position', {x: 0, y: -1, z: -100});
+    console.log("POSITION: ", floor.getAttribute('position'));
+    floor.setAttribute('class', 'floor');
+    document.getElementById('scene').appendChild(floor);
 }
 
-function moveCacti() {
-    const cacti = document.getElementsByClassName('cactus');
-    for (let i = 0; i < cacti.length; i++) {
-        const positionAttr = cacti[i].getAttribute('position');
+function moveObstacles() {
+    const obstacles = document.getElementsByClassName('obstacle');
+    for (let i = 0; i < obstacles.length; i++) {
+        const positionAttr = obstacles[i].getAttribute('position');
         const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
-        cacti[i].setAttribute('position', {x: 0, y: -1, z: position.z + 0.1});
-        if (position.z > 50) {
-            cacti[i].remove();
-            spawnCactus();
+        obstacles[i].setAttribute('position', {x: 0, y: -1, z: position.z + 0.1});
+        if (position.z > 60) {
+            obstacles[i].remove();
         }
     }
 }
 
 setInterval(() => {
-    moveCacti();
-    // toMove = document.getElementsByClassName("move");
-    // for (let i = 0; i < toMove.length; i++) {
-    //     toMove[i].setAttribute('position', {
-    //         x: toMove[i].getAttribute('position').x,
-    //         y: toMove[i].getAttribute('position').y,
-    //         z: toMove[i].getAttribute('position').z + 0.1
-    //     });
-    // }
+    spawnObstacle();
+}, 1000);
+
+spawnFloor();
+
+setInterval(() => {
+    moveObstacles();
+    floors = document.getElementsByClassName("floor");
+    let spawn = false;
+    for (let i = 0; i < floors.length; i++) {
+        const positionAttr = floors[i].getAttribute('position');
+        const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+        floors[i].setAttribute('position', { x: 0, y: -1, z: position.z + 0.1 });
+        console.log(position.z)
+        if (Math.floor(position.z) === 0) {
+            spawn = true;
+        } else if (position.z > 70) {
+            floors[i].remove();
+        }
+    }
+    if (spawn) {
+        spawnFloor();
+    }
+    return;
 }, 10);
