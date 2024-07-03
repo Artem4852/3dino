@@ -112,6 +112,6 @@ setInterval(() => {
     cactus.setAttribute('position', {
         x: cactus.getAttribute('position').x,
         y: cactus.getAttribute('position').y,
-        z: cactus.getAttribute('position').z + 0.01
+        z: cactus.getAttribute('position').z + 0.02
     });
 }, 10);
