@@ -34,6 +34,8 @@
             <a-asset-item id="pteranodon_wing_l_mtl" src="assets/pteranodon_wing_l.mtl"></a-asset-item>
             <a-asset-item id="pteranodon_wing_r_obj" src="assets/pteranodon_wing_r.obj"></a-asset-item>
             <a-asset-item id="pteranodon_wing_r_mtl" src="assets/pteranodon_wing_r.mtl"></a-asset-item>
+            <a-asset-item id="floor_roll_obj" src="assets/floor_roll.obj"></a-asset-item>
+            <a-asset-item id="floor_roll_mtl" src="assets/floor_roll.mtl"></a-asset-item>
         </a-assets>
 
         <!-- <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity> -->
@@ -44,13 +46,18 @@
 
         <!-- <a-obj-model src="#cactus_big_1_obj", mtl="#cactus_big_1_mtl" scale="0.7 0.7 0.7" position="5 0 0"></a-obj-model> -->
 
-        <!-- <a-entity position="0 5 0">
+        <a-obj-model class="floor_roll" get-dimensions src="#floor_roll_obj" mtl="#floor_roll_mtl" scale="0.7 0.7 0.7"
+            position="0 11.52412 -50"></a-obj-model>
+        <a-obj-model class="floor_roll" get-dimensions src="#floor_roll_obj" mtl="#floor_roll_mtl" scale="0.7 0.7 0.7"
+            position="0 11.52412 50"></a-obj-model>
+
+        <!-- <a-entity position="-2 0 0" class="pteranodon">
             <a-obj-model get-dimensions src="#pteranodon_base_obj" mtl="#pteranodon_base_mtl" scale="0.7 0.7 0.7"
                 position="0 0 0"></a-obj-model>
             <a-obj-model get-dimensions src="#pteranodon_wing_l_obj" mtl="#pteranodon_wing_l_mtl" scale="0.7 0.7 0.7"
-                position="0 0.78 -3.03806"></a-obj-model>
+                position="0 0.78 -3.03806" rotation="0 0 -25"></a-obj-model>
             <a-obj-model get-dimensions src="#pteranodon_wing_r_obj" mtl="#pteranodon_wing_r_mtl" scale="0.7 0.7 0.7"
-                position="0 0.78 -3.03806"></a-obj-model>
+                position="0 0.78 -3.03806"  rotation="0 0 25"></a-obj-model>
         </a-entity> -->
 
         <!-- <a-obj-model class="floor" get-dimensions src="#floor_1_obj" mtl="#floor_1_mtl" position="0 -1 0" rotation="0 0 0" scale="0.7 0.7 0.7"></a-obj-model> -->

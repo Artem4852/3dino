@@ -61,7 +61,6 @@ const camera = document.getElementById('camera');
 let movingUp = true;
 let shiftPressed = false;
 let isJumping = false;
-let reload = false;
 setInterval(() => {
     if (isJumping || reload) return;
 
