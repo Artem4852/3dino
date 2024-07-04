@@ -28,21 +28,21 @@ function jump() {
     isJumping = true;
 
     const gravity = -9.8;
-    const initialVelocity = 5;
-    const jumpDuration = 2;
-    const frameDuration = 1 / 30;
+    const initialVelocity = 12;
+    const frameDuration = 1 / 60;
 
     let time = 0;
-    let velocity = initialVelocity;
     const startPosition = parseFloat(camera.getAttribute('position').y);
 
     function animateJump() {
         time += frameDuration;
 
-        const delta = velocity * frameDuration + 0.5 * gravity * frameDuration * frameDuration;
-        velocity += gravity * frameDuration;
+        let newPosition = startPosition + initialVelocity * time + 0.5 * gravity * time * time;
 
-        const newPosition = Math.max(startPosition, startPosition + delta);
+        if (newPosition < startPosition) {
+            newPosition = startPosition; 
+            isJumping = false;
+        }
 
         camera.setAttribute('position', {
             x: camera.getAttribute('position').x,
@@ -50,20 +50,10 @@ function jump() {
             z: camera.getAttribute('position').z
         });
 
-        console.log('New position:', newPosition);
-
-        if (time < jumpDuration && newPosition > startPosition) {
+        if (isJumping) {
             requestAnimationFrame(animateJump);
-        } else {
-            camera.setAttribute('position', {
-                x: camera.getAttribute('position').x,
-                y: startPosition,
-                z: camera.getAttribute('position').z
-            });
-            isJumping = false;
         }
     }
-
     animateJump();
 }
 
@@ -71,8 +61,9 @@ const camera = document.getElementById('camera');
 let movingUp = true;
 let shiftPressed = false;
 let isJumping = false;
+let reload = false;
 setInterval(() => {
-    if (isJumping) return;
+    if (isJumping || reload) return;
 
     if (shiftPressed && camera.getAttribute('position').y > 1.3) {
         camera.setAttribute('position', '0 1 20');
@@ -111,13 +102,19 @@ function spawnObstacle() {
     return new Promise((resolve) => {
         const obstacle = document.createElement('a-obj-model');
         choice = "#" + obstacle_names[Math.floor(Math.random() * obstacle_names.length)];
+        size = choice.includes("small") ? "short" : "tall";
         obstacle.setAttribute('src', choice + '_obj');
         obstacle.setAttribute('mtl', choice + '_mtl');
         obstacle.setAttribute('scale', '0.7 0.7 0.7');
-        obstacle.setAttribute('position', {x: 0, y: -1, z: -50});
-        // console.log('Spawning obstacle at:', obstacle.getAttribute('position'));
+        obstacle.setAttribute('position', {x: 0, y: -0.9, z: -50});
         obstacle.setAttribute('rotation', {x: 0, y: Math.random() * 360, z: 0});
         obstacle.setAttribute('class', 'obstacle');
+
+        obstacle.setAttribute('shadow', 'cast: true');
+        obstacle.setAttribute('shadowcaster', '');
+        obstacle.setAttribute('material', 'shader: standard');
+
+        obstacle.setAttribute('data-obstacle_type', size + "_cactus")
         obstacle.addEventListener('loaded', () => resolve(obstacle));
         document.getElementById('scene').appendChild(obstacle);
     });
@@ -132,6 +129,10 @@ function spawnFloor(origin = false) {
         floor.setAttribute('scale', '0.7 0.7 0.7');
         floor.setAttribute('position', {x: 0, y: -1, z: origin ? 0 : -100});
         floor.setAttribute('class', 'floor');
+
+        floor.setAttribute('shadow', 'receive: true');
+        floor.setAttribute('material', 'shader: standard');
+
         floor.addEventListener('loaded', () => resolve(floor));
         document.getElementById('scene').appendChild(floor);
     });
@@ -145,6 +146,30 @@ function moveObstacles() {
         obstacles[i].setAttribute('position', {x: 0, y: -1, z: position.z + 0.1});
         if (position.z > 60) {
             obstacles[i].remove();
+        }
+    }
+}
+
+function checkCollisions() {
+    const camera = document.getElementById('camera');
+    const cameraPositionAttr = camera.getAttribute('position');
+    const cameraPosition = typeof cameraPositionAttr === 'string' ? AFRAME.utils.coordinates.parse(cameraPositionAttr) : cameraPositionAttr;
+    const obstacles = document.getElementsByClassName('obstacle');
+    for (let i = 0; i < obstacles.length; i++) {
+        const obstacle = obstacles[i];
+        const positionAttr = obstacle.getAttribute('position');
+        const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+        if (position.z > cameraPosition.z + 1 || position.z < cameraPosition.z - 1 || reload) continue;
+        // console.log(cameraPosition, position)
+        if (obstacle.getAttribute('data-obstacle_type') === 'short_cactus' && cameraPosition.y < 5) {
+            alert("Game over!");
+            reload = true;
+            return;
+        }
+        else if (obstacle.getAttribute('data-obstacle_type') === 'tall_cactus' && cameraPosition.y < 8) {
+            alert("Game over!");
+            reload = true;
+            return;
         }
     }
 }
@@ -164,6 +189,11 @@ initializeFloors();
 
 let lastSpawned = 0;
 setInterval(() => {
+    checkCollisions();
+    if (reload) {
+        location.reload();
+        return;
+    }
     moveObstacles();
     floors = document.getElementsByClassName("floor");
     let spawn = false;
