@@ -28,6 +28,12 @@
             <a-asset-item id="floor_3_mtl" src="assets/floor_3.mtl"></a-asset-item>
             <a-asset-item id="floor_4_obj" src="assets/floor_4.obj"></a-asset-item>
             <a-asset-item id="floor_4_mtl" src="assets/floor_4.mtl"></a-asset-item>
+            <a-asset-item id="pteranodon_base_obj" src="assets/pteranodon_base.obj"></a-asset-item>
+            <a-asset-item id="pteranodon_base_mtl" src="assets/pteranodon_base.mtl"></a-asset-item>
+            <a-asset-item id="pteranodon_wing_l_obj" src="assets/pteranodon_wing_l.obj"></a-asset-item>
+            <a-asset-item id="pteranodon_wing_l_mtl" src="assets/pteranodon_wing_l.mtl"></a-asset-item>
+            <a-asset-item id="pteranodon_wing_r_obj" src="assets/pteranodon_wing_r.obj"></a-asset-item>
+            <a-asset-item id="pteranodon_wing_r_mtl" src="assets/pteranodon_wing_r.mtl"></a-asset-item>
         </a-assets>
 
         <!-- <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity> -->
@@ -36,39 +42,52 @@
         <a-sky color="#88DDEC"></a-sky>
         <a-light type="directional" color="#FFF" intensity="1" position="-1 2 1" castShadow="true"></a-light>
 
+        <!-- <a-obj-model src="#cactus_big_1_obj", mtl="#cactus_big_1_mtl" scale="0.7 0.7 0.7" position="5 0 0"></a-obj-model> -->
+
+        <!-- <a-entity position="0 5 0">
+            <a-obj-model get-dimensions src="#pteranodon_base_obj" mtl="#pteranodon_base_mtl" scale="0.7 0.7 0.7"
+                position="0 0 0"></a-obj-model>
+            <a-obj-model get-dimensions src="#pteranodon_wing_l_obj" mtl="#pteranodon_wing_l_mtl" scale="0.7 0.7 0.7"
+                position="0 0.78 -3.03806"></a-obj-model>
+            <a-obj-model get-dimensions src="#pteranodon_wing_r_obj" mtl="#pteranodon_wing_r_mtl" scale="0.7 0.7 0.7"
+                position="0 0.78 -3.03806"></a-obj-model>
+        </a-entity> -->
+
         <!-- <a-obj-model class="floor" get-dimensions src="#floor_1_obj" mtl="#floor_1_mtl" position="0 -1 0" rotation="0 0 0" scale="0.7 0.7 0.7"></a-obj-model> -->
     </a-scene>
 
     <script>
-        AFRAME.registerComponent('custom-wasd-controls', {
-            init: function () {
-                this.el.addEventListener('keydown', (event) => {
-                    if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
-                        event.preventDefault();
-                    }
-                });
-            }
-        });
-
-        // The best way I could think of to get dimensions of the floor...
-        // AFRAME.registerComponent('get-dimensions', {
+        // AFRAME.registerComponent('custom-wasd-controls', {
         //     init: function () {
-        //         this.el.addEventListener('model-loaded', () => {
-        //             const mesh = this.el.getObject3D('mesh');
-        //             if (mesh) {
-        //                 const box = new THREE.Box3().setFromObject(mesh);
-        //                 const size = box.getSize(new THREE.Vector3());
-
-        //                 console.log('Dimensions:', size);
-
-        //                 const position = this.el.object3D.position;
-        //                 const endX = position.x + size.x * this.el.object3D.scale.x / 2;
-        //                 console.log('End X position:', endX);
+        //         this.el.addEventListener('keydown', (event) => {
+        //             if (['w', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
+        //                 event.preventDefault();
         //             }
         //         });
         //     }
         // });
+
+        // The best way I could think of to get dimensions of the floor...
+        AFRAME.registerComponent('get-dimensions', {
+            init: function () {
+                this.el.addEventListener('model-loaded', () => {
+                    const mesh = this.el.getObject3D('mesh');
+                    if (mesh) {
+                        const box = new THREE.Box3().setFromObject(mesh);
+                        const size = box.getSize(new THREE.Vector3());
+                        console.log(this.el.getAttribute('src'));
+
+                        console.log('Dimensions:', size);
+
+                        const position = this.el.object3D.position;
+                        const endX = position.x + size.x * this.el.object3D.scale.x / 2;
+                        // console.log('End X position:', endX);
+                    }
+                });
+            }
+        });
     </script>
-    <script src="script.js"></script>
+    <script src="camera.js"></script>
+    <script src="level.js"></script>
 </body>
 </html>
