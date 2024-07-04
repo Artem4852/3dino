@@ -17,21 +17,21 @@ function spawnObstacle() {
             const base = document.createElement('a-obj-model');
             base.setAttribute('src', '#pteranodon_base_obj');
             base.setAttribute('mtl', '#pteranodon_base_mtl');
-            base.setAttribute('scale', '0.7 0.7 0.7');
+            base.setAttribute('scale', '1 1 1');
             base.setAttribute('position', '0 0 0');
             obstacle.appendChild(base);
 
             const wing_l = document.createElement('a-obj-model');
             wing_l.setAttribute('src', '#pteranodon_wing_l_obj');
             wing_l.setAttribute('mtl', '#pteranodon_wing_l_mtl');
-            wing_l.setAttribute('scale', '0.7 0.7 0.7');
+            wing_l.setAttribute('scale', '1 1 1');
             wing_l.setAttribute('position', '0 0.78 -3.03806');
             obstacle.appendChild(wing_l);
 
             const wing_r = document.createElement('a-obj-model');
             wing_r.setAttribute('src', '#pteranodon_wing_r_obj');
             wing_r.setAttribute('mtl', '#pteranodon_wing_r_mtl');
-            wing_r.setAttribute('scale', '0.7 0.7 0.7');
+            wing_r.setAttribute('scale', '1 1 1');
             wing_r.setAttribute('position', '0 0.78 -3.03806');
             obstacle.appendChild(wing_r);
 
@@ -44,7 +44,7 @@ function spawnObstacle() {
             size = choice.includes('small') ? 'short' : 'tall';
             obstacle.setAttribute('src', id + '_obj');
             obstacle.setAttribute('mtl', id + '_mtl');
-            obstacle.setAttribute('scale', '0.7 0.7 0.7');
+            obstacle.setAttribute('scale', '1 1 1');
             obstacle.setAttribute('position', { x: 0, y: -0.9, z: -50 });
             obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
             obstacle.setAttribute('class', 'obstacle');
@@ -66,7 +66,7 @@ function spawnFloor(origin = false) {
         choice = '#floor_' + (Math.floor(Math.random() * 3) + 1);
         floor.setAttribute('src', choice + '_obj');
         floor.setAttribute('mtl', choice + '_mtl');
-        floor.setAttribute('scale', '0.7 0.7 0.7');
+        floor.setAttribute('scale', '1 1 1');
         floor.setAttribute('position', {x: 0, y: -1, z: origin ? 0 : -100});
         floor.setAttribute('class', 'floor');
 
@@ -78,13 +78,22 @@ function spawnFloor(origin = false) {
     });
 }
 
+// heights of obstacles
+// small cactus 2.31
+// tall cactus 5.82
+
 function moveObstacles() {
     const obstacles = document.getElementsByClassName('obstacle');
     for (let i = 0; i < obstacles.length; i++) {
-        const positionAttr = obstacles[i].getAttribute('position');
+        const obstacle = obstacles[i];
+        const positionAttr = obstacle.getAttribute('position');
         const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
-        obstacles[i].setAttribute('position', {x: 0, y: position.y, z: position.z + 0.1});
-        if (position.z > 60) {
+        obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + 0.1 });
+        type = obstacle.getAttribute('data-obstacle_type');
+        if (type === 'tall_cactus') {
+            obstacles[i].setAttribute('scale',  { x: 0.7, y: Math.min(0.7, (-Math.abs(position.z)/32+2)*0.7), z: 0.7 });
+        }
+        if (position.z > 50) {
             obstacles[i].remove();
         }
     }
