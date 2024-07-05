@@ -2,80 +2,42 @@ function lerp(start, end, alpha) {
     return start * (1 - alpha) + end * alpha;
 }
 
-const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_small_1', 'cactus_small_2', 'pteranodon', 'pteranodon', 'pteranodon_l']
+const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_small_1', 'cactus_small_2', 'pteranodon', 'pteranodon', 'pteranodon']
 let reload = false;
 
 function spawnObstacle() {
-    return new Promise((resolve) => {
-        choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
-        if (choice === 'pteranodon' || choice === 'pteranodon_l') {
-            const obstacle = document.createElement('a-entity');
-            obstacle.setAttribute('position', { x: 0, y: choice === 'pteranodon' ? 4 : 1, z: -50 });
-            obstacle.setAttribute('class', 'obstacle pteranodon');
-            obstacle.setAttribute('data-obstacle_type', choice === 'pteranodon' ? 'pteranodon' : 'pteranodon_l')
+    choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
+    const obstacle = document.getElementById(choice).cloneNode(true);
+    obstacle.removeAttribute('id');
+    obstacle.setAttribute('class', 'obstacle');
 
-            const base = document.createElement('a-obj-model');
-            base.setAttribute('src', '#pteranodon_base_obj');
-            base.setAttribute('mtl', '#pteranodon_base_mtl');
-            base.setAttribute('scale', '1 1 1');
-            base.setAttribute('position', '0 0 0');
-            obstacle.appendChild(base);
-
-            const wing_l = document.createElement('a-obj-model');
-            wing_l.setAttribute('src', '#pteranodon_wing_l_obj');
-            wing_l.setAttribute('mtl', '#pteranodon_wing_l_mtl');
-            wing_l.setAttribute('scale', '1 1 1');
-            wing_l.setAttribute('position', '0 0.78 -3.03806');
-            obstacle.appendChild(wing_l);
-
-            const wing_r = document.createElement('a-obj-model');
-            wing_r.setAttribute('src', '#pteranodon_wing_r_obj');
-            wing_r.setAttribute('mtl', '#pteranodon_wing_r_mtl');
-            wing_r.setAttribute('scale', '1 1 1');
-            wing_r.setAttribute('position', '0 0.78 -3.03806');
-            obstacle.appendChild(wing_r);
-
-            obstacle.addEventListener('loaded', () => resolve(obstacle));
-            document.getElementById('scene').appendChild(obstacle);
+    if (choice === 'pteranodon') {
+        obstacle.setAttribute('class', 'obstacle pteranodon');
+        if (Math.random() > 0.5) {
+            obstacle.setAttribute('data-obstacle_type', 'pteranodon_l');
+            obstacle.setAttribute('position', { x: 0, y: 1, z: -50 });
         }
         else {
-            const obstacle = document.createElement('a-obj-model');
-            id = '#' + choice;
-            size = choice.includes('small') ? 'short' : 'tall';
-            obstacle.setAttribute('src', id + '_obj');
-            obstacle.setAttribute('mtl', id + '_mtl');
-            obstacle.setAttribute('scale', '1 1 1');
-            obstacle.setAttribute('position', { x: 0, y: -0.9, z: -50 });
-            obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
-            obstacle.setAttribute('class', 'obstacle');
-
-            obstacle.setAttribute('shadow', 'cast: true');
-            obstacle.setAttribute('shadowcaster', '');
-            obstacle.setAttribute('material', 'shader: standard');
-
-            obstacle.setAttribute('data-obstacle_type', size + '_cactus')
-            obstacle.addEventListener('loaded', () => resolve(obstacle));
-            document.getElementById('scene').appendChild(obstacle);
+            obstacle.setAttribute('position', { x: 0, y: 4, z: -50 });
         }
-    });
+    }
+    else {
+        obstacle.setAttribute('position', { x: 0, y: -0.9, z: -50 });
+        obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
+    }
+
+    document.getElementById('scene').appendChild(obstacle);
 }
 
 function spawnFloor(origin = false) {
-    return new Promise((resolve) => {
-        const floor = document.createElement('a-obj-model');
-        choice = '#floor_' + (Math.floor(Math.random() * 3) + 1);
-        floor.setAttribute('src', choice + '_obj');
-        floor.setAttribute('mtl', choice + '_mtl');
-        floor.setAttribute('scale', '1 1 1');
-        floor.setAttribute('position', {x: 0, y: -1, z: origin ? 0 : -100});
-        floor.setAttribute('class', 'floor');
+    console.log('floor_' + (Math.floor(Math.random() * 3)+1));
+    const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3)+1)).cloneNode(true);
+    floor.removeAttribute('id');
+    floor.setAttribute('class', 'floor');
 
-        floor.setAttribute('shadow', 'receive: true');
-        floor.setAttribute('material', 'shader: standard');
+    floor.setAttribute('position', {x: 0, y: -1, z: origin ? 0 : -100});
 
-        floor.addEventListener('loaded', () => resolve(floor));
-        document.getElementById('scene').appendChild(floor);
-    });
+    document.getElementById('scene').appendChild(floor);
 }
 
 // heights of obstacles
@@ -143,7 +105,7 @@ function animateRolls() {
 
         function animate() {
             if (alpha < 1) {
-                alpha += 0.00179;
+                alpha += 0.0018;
                 const newRotation = lerp(0, -360, alpha);
                 roll.setAttribute('rotation', {
                     x: newRotation,
@@ -187,18 +149,20 @@ function checkCollisions() {
     }
 }
 
-async function spawnObstacleRandomly() {
-    await spawnObstacle();
+function spawnObstacleRandomly() {
+    spawnObstacle();
     setTimeout(spawnObstacleRandomly, Math.floor(Math.random() * 1000) + 1500);
 }
 setTimeout(spawnObstacleRandomly, 1000);
 
 
-async function initializeFloors() {
-    await spawnFloor(true);
-    await spawnFloor(false);
+function initializeFloors() {
+    spawnFloor(true);
+    spawnFloor(false);
 }
-initializeFloors();
+setTimeout(() => {
+    initializeFloors();
+}, 500);
 
 setInterval(() => {
     animatePteros();
