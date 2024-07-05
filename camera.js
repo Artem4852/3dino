@@ -58,10 +58,14 @@ function jump() {
 }
 
 const camera = document.getElementById('camera');
+camera.removeAttribute('wasd-controls');
+camera.setAttribute('custom-wasd-controls', '');
+
 let movingUp = true;
 let shiftPressed = false;
 let isJumping = false;
 setInterval(() => {
+    checkCollisions();
     if (isJumping || reload) return;
 
     if (shiftPressed && camera.getAttribute('position').y > 1.3) {

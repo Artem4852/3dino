@@ -38,25 +38,25 @@
             <a-asset-item id="floor_roll_mtl" src="assets/floor_roll.mtl"></a-asset-item>
         </a-assets>
 
-        <!-- <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity> -->
-        <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 0"></a-entity>
+        <a-entity id="camera" camera look-controls wasd-controls position="0 3 0"></a-entity>
+        <!-- <a-entity id="camera" camera look-controls custom-wasd-controls position="0 3 0"></a-entity> -->
 
         <a-sky color="#EEEEEE"></a-sky>
         <!-- <a-light type="directional" color="#EEEEEE" intensity="1" position="-1 2 1" castShadow="true"></a-light> -->
         
         <!-- prefabs -->
-        <a-obj-model id="cactus_small_1" data-obstacle_type="short_cactus" src="#cactus_small_1_obj" mtl="#cactus_small_1_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
-        <a-obj-model id="cactus_small_2" data-obstacle_type="short_cactus" src="#cactus_small_2_obj" mtl="#cactus_small_2_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
-        <a-obj-model id="cactus_big_1" data-obstacle_type="tall_cactus" src="#cactus_big_1_obj" mtl="#cactus_big_1_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
-        <a-obj-model id="cactus_big_2" data-obstacle_type="tall_cactus" src="#cactus_big_2_obj" mtl="#cactus_big_2_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
-        <a-obj-model id="cactus_big_3" data-obstacle_type="tall_cactus" src="#cactus_big_3_obj" mtl="#cactus_big_3_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
+        <a-obj-model id="cactus_small_1" data-obstacle_type="short_cactus" src="#cactus_small_1_obj" mtl="#cactus_small_1_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="cactus_small_2" data-obstacle_type="short_cactus" src="#cactus_small_2_obj" mtl="#cactus_small_2_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="cactus_big_1" data-obstacle_type="tall_cactus" src="#cactus_big_1_obj" mtl="#cactus_big_1_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="cactus_big_2" data-obstacle_type="tall_cactus" src="#cactus_big_2_obj" mtl="#cactus_big_2_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="cactus_big_3" data-obstacle_type="tall_cactus" src="#cactus_big_3_obj" mtl="#cactus_big_3_mtl" scale="1 1 1" position="0 -10 0" shadow="cast: true" shadowcaster material="shader: standard" visible="false"></a-obj-model>
         
-        <a-obj-model id="floor_1" src="#floor_1_obj" mtl="#floor_1_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard"></a-obj-model>
-        <a-obj-model id="floor_2" src="#floor_2_obj" mtl="#floor_2_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard"></a-obj-model>
-        <a-obj-model id="floor_3" src="#floor_3_obj" mtl="#floor_3_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard"></a-obj-model>
-        <a-obj-model id="floor_4" src="#floor_4_obj" mtl="#floor_4_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard"></a-obj-model>
+        <a-obj-model id="floor_1" src="#floor_1_obj" mtl="#floor_1_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="floor_2" src="#floor_2_obj" mtl="#floor_2_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="floor_3" src="#floor_3_obj" mtl="#floor_3_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard" visible="false"></a-obj-model>
+        <a-obj-model id="floor_4" src="#floor_4_obj" mtl="#floor_4_mtl" scale="1 1 1" position="0 -10 0" shadow="receive: true" material="shader: standard" visible="false"></a-obj-model>
 
-        <a-entity id="pteranodon" data-obstacle_type="pteranodon" position="0 -10 0">
+        <a-entity id="pteranodon" data-obstacle_type="pteranodon" position="0 -10 0" visible="false">
             <a-obj-model src="#pteranodon_base_obj" mtl="#pteranodon_base_mtl" scale="1 1 1" position="0 0 0" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
             <a-obj-model src="#pteranodon_wing_l_obj" mtl="#pteranodon_wing_l_mtl" scale="1 1 1" position="0 0.78 -3.03806" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
             <a-obj-model src="#pteranodon_wing_r_obj" mtl="#pteranodon_wing_r_mtl" scale="1 1 1" position="0 0.78 -3.03806" shadow="cast: true" shadowcaster material="shader: standard"></a-obj-model>
@@ -67,6 +67,15 @@
         <a-obj-model class="floor_roll" src="#floor_roll_obj" mtl="#floor_roll_mtl" scale="1 1 1"
             position="0 11.6 50"></a-obj-model>
     </a-scene>
+
+    <div class="menu">
+        <h1>Dino Dash 3D</h1>
+        <h2>Loading...</h2>
+        <div id="loading-wrapper">
+            <div id="loading-bar"></div>
+        </div>
+        <button onclick="start()">Start</button>
+    </div>
 
     <script>
         // AFRAME.registerComponent('custom-wasd-controls', {

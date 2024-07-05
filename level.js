@@ -7,18 +7,36 @@ function getPos(object) {
     return typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
 }
 
+const loadingBar = document.getElementById('loading-bar');
+let pause = true;
+
+function start() {
+    document.getElementsByClassName('menu')[0].style = 'display: none';
+    pause = false;
+}
+
 const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_small_1', 'cactus_small_2', 'pteranodon', 'pteranodon', 'pteranodon']
 // const obstacle_names = ['pteranodon', 'pteranodon', 'pteranodon']
 let reload = false;
+
+function createPool() {
+    for (let i = 0; i < 30; i++) {
+        spawnObstacle();
+    }
+    for (let i = 0; i < 10; i++) {
+        spawnFloor();
+    }
+}
 
 function spawnObstacle() {
     choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
     const obstacle = document.getElementById(choice).cloneNode(true);
     obstacle.removeAttribute('id');
-    obstacle.setAttribute('class', 'obstacle');
+    obstacle.setAttribute('class', 'obstacle inactive');
+    obstacle.setAttribute('visible', 'true')
 
     if (choice === 'pteranodon') {
-        obstacle.setAttribute('class', 'obstacle pteranodon');
+        obstacle.setAttribute('class', 'obstacle inactive pteranodon');
         if (Math.random() > 0.5) {
             obstacle.setAttribute('data-obstacle_type', 'pteranodon_l');
             obstacle.setAttribute('position', { x: 0, y: 1, z: -80 });
@@ -35,14 +53,40 @@ function spawnObstacle() {
     document.getElementById('scene').appendChild(obstacle);
 }
 
+function activateObstacle() {
+    inactive = document.getElementsByClassName('inactive');
+    obstacle = inactive[Math.floor(Math.random() * inactive.length)];
+    // console.log(obstacle.getAttribute('class'));
+    obstacle.setAttribute('class', obstacle.getAttribute('class').replace('inactive', 'active'));
+}
+
+function deactivateObstacle(obstacle) {
+    position = getPos(obstacle);
+    obstacle.setAttribute('position', {x: 0, y: position.y, z: -80})
+    obstacle.setAttribute('class', obstacle.getAttribute('class').replace('active', 'inactive'));
+}
+
 function spawnFloor(origin = false) {
     const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3)+1)).cloneNode(true);
     floor.removeAttribute('id');
-    floor.setAttribute('class', 'floor');
+    floor.setAttribute('class', origin ? 'floor_active' : 'floor_inactive');
+    floor.setAttribute('visible', 'true')
 
     floor.setAttribute('position', {x: 0, y: -1, z: origin ? 0 : -100});
 
     document.getElementById('scene').appendChild(floor);
+}
+
+function activateFloor() {
+    inactive = document.getElementsByClassName('floor_inactive');
+    floor = inactive[Math.floor(Math.random() * inactive.length)];
+    floor.setAttribute('class', floor.getAttribute('class').replace('inactive', 'active'));
+}
+
+function deactivateFloor(floor) {
+    position = getPos(floor);
+    floor.setAttribute('position', {x: position.x, y: position.y, z: -100})
+    floor.setAttribute('class', floor.getAttribute('class').replace('active', 'inactive'));
 }
 
 heights = {
@@ -64,7 +108,7 @@ function getPosX(posZ) {
     if (posZ <= 20 && posZ >= -20) return 0;
     offset = posZ < 0 ? -50 : 50;
     posX = 0.33 * -Math.sqrt(Math.pow(30, 2) - Math.pow((posZ - offset), 2));
-    if (posX === NaN) console.log(posZ, offset);
+    // if (posX === NaN) console.log(posZ, offset);
     return posX;
 }
 
@@ -75,7 +119,7 @@ function getRotation(diffX, diffZ) {
 }
 
 function moveObstacles() {
-    const obstacles = document.getElementsByClassName('obstacle');
+    const obstacles = document.getElementsByClassName('active');
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
@@ -90,12 +134,12 @@ function moveObstacles() {
         else if (type === 'pteranodon' || type === 'pteranodon_l') {
             obstacle.setAttribute('position', { x: getPosX(position.z + 0.1), y: position.y, z: position.z });
             newPos = getPos(obstacle);
-            console.log(`New position: ${newPos.x}, ${newPos.z}`);
+            // console.log(`New position: ${newPos.x}, ${newPos.z}`);
             rotation = getRotation(newPos.x - oldX, newPos.z - oldZ);
             obstacle.setAttribute('rotation', { x: 0, y: rotation, z: 0 });
         }
-        if (position.z > 50) {
-            obstacles[i].remove();
+        if (position.z > 80) {
+            deactivateObstacle(obstacles[i]);
         }
     }
 }
@@ -161,7 +205,7 @@ function animateRolls() {
 function checkCollisions() {
     const camera = document.getElementById('camera');
     const cameraPosition = getPos(camera);
-    const obstacles = document.getElementsByClassName('obstacle');
+    const obstacles = document.getElementsByClassName('active');
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
@@ -185,19 +229,26 @@ function checkCollisions() {
     }
 }
 
-function spawnObstacleRandomly() {
-    spawnObstacle();
-    setTimeout(spawnObstacleRandomly, Math.floor(Math.random() * 1000) + 1500);
+createPool()
+function activateObstacleRandomly() {
+    activateObstacle();
+    setTimeout(activateObstacleRandomly, Math.floor(Math.random() * 1000) + 1500);
 }
-setTimeout(spawnObstacleRandomly, 1000);
+setTimeout(activateObstacleRandomly, 2000);
+
+setTimeout(() => {
+    loadingBar.style = 'width: 40%';    
+}, 1000);
 
 function initializeFloors() {
     spawnFloor(true);
-    spawnFloor(false);
+    loadingBar.style = 'width: 60%';
+    activateFloor();
 }
 setTimeout(() => {
     initializeFloors();
-}, 500);
+    loadingBar.style = 'width: 100%';
+}, 2000);
 
 setInterval(() => {
     animatePteros(300);
@@ -210,14 +261,13 @@ setInterval(() => {
 
 let lastSpawned = 0;
 setInterval(() => {
-    // return;
-    checkCollisions();
+    if (pause) return;
     if (reload) {
         location.reload();
         return;
     }
     moveObstacles();
-    floors = document.getElementsByClassName('floor');
+    floors = document.getElementsByClassName('floor_active');
     let spawn = false;
     lastSpawned += 0.1;
     for (let i = 0; i < floors.length; i++) {
@@ -227,11 +277,11 @@ setInterval(() => {
             spawn = true;
             lastSpawned = 0;
         } else if (position.z > 100) {
-            floors[i].remove();
+            deactivateFloor(floors[i]);
         }
     }
     if (spawn) {
-        spawnFloor();
+        activateFloor();
     }
     return;
 }, 10);
