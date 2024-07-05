@@ -2,7 +2,13 @@ function lerp(start, end, alpha) {
     return start * (1 - alpha) + end * alpha;
 }
 
+function getPos(object) {
+    const positionAttr = object.getAttribute('position');
+    return typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+}
+
 const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_small_1', 'cactus_small_2', 'pteranodon', 'pteranodon', 'pteranodon']
+// const obstacle_names = ['cactus_small_1', 'cactus_small_2']
 let reload = false;
 
 function spawnObstacle() {
@@ -15,10 +21,10 @@ function spawnObstacle() {
         obstacle.setAttribute('class', 'obstacle pteranodon');
         if (Math.random() > 0.5) {
             obstacle.setAttribute('data-obstacle_type', 'pteranodon_l');
-            obstacle.setAttribute('position', { x: 0, y: 1, z: -50 });
+            obstacle.setAttribute('position', { x: 0, y: 1, z: -80 });
         }
         else {
-            obstacle.setAttribute('position', { x: 0, y: 4, z: -50 });
+            obstacle.setAttribute('position', { x: 0, y: 4, z: -80 });
         }
     }
     else {
@@ -30,7 +36,6 @@ function spawnObstacle() {
 }
 
 function spawnFloor(origin = false) {
-    console.log('floor_' + (Math.floor(Math.random() * 3)+1));
     const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3)+1)).cloneNode(true);
     floor.removeAttribute('id');
     floor.setAttribute('class', 'floor');
@@ -40,20 +45,41 @@ function spawnFloor(origin = false) {
     document.getElementById('scene').appendChild(floor);
 }
 
-// heights of obstacles
-// small cactus 2.31
-// tall cactus 5.82
+heights = {
+    'short_cactus': 2.31,
+    'tall_cactus': 5.82
+}
+
+function getPosY(posZ, type) {
+    height = heights[type];
+    maxPosY = -0.9;
+    if (posZ < 25 && posZ > -25) return maxPosY;
+    offset = posZ < 0 ? -45 : 45;
+    maxHeight = -Math.sqrt(Math.pow(25, 2) - Math.pow((posZ - offset), 2)) + 25;
+    if (height < maxHeight) return maxPosY;
+    return maxPosY - (height - maxHeight);
+}
+
+function getPosX(posZ) {
+    if (posZ <= 20 && posZ >= -20) return 0;
+    offset = posZ < 0 ? -50 : 50;
+    posX = 0.33 * -Math.sqrt(Math.pow(30, 2) - Math.pow((posZ - offset), 2));
+    if (posX === NaN) console.log(posZ, offset);
+    return posX;
+}
 
 function moveObstacles() {
     const obstacles = document.getElementsByClassName('obstacle');
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
-        const positionAttr = obstacle.getAttribute('position');
-        const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+        const position = getPos(obstacle);
         obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + 0.1 });
         type = obstacle.getAttribute('data-obstacle_type');
-        if (type === 'tall_cactus') {
-            obstacles[i].setAttribute('scale',  { x: 0.7, y: Math.min(0.7, (-Math.abs(position.z)/32+2)*0.7), z: 0.7 });
+        if (type === 'tall_cactus' || type === 'short_cactus') {
+            obstacles[i].setAttribute('position', { x: 0, y: getPosY(position.z + 0.1, type), z: position.z });
+        }
+        else if (type === 'pteranodon' || type === 'pteranodon_l') {
+            obstacles[i].setAttribute('position', { x: getPosX(position.z + 0.1), y: position.y, z: position.z });
         }
         if (position.z > 50) {
             obstacles[i].remove();
@@ -71,8 +97,6 @@ function animatePteros() {
         const rotationR = parseFloat(rightWing.getAttribute('rotation').z);
         const targetRotation = Math.floor(rotationL) >= 9 ? -25 : 10;
         let alpha = 0;
-        
-        console.log(leftWing.getAttribute('rotation'), targetRotation, rightWing.getAttribute('rotation'));
 
         function animate() {
             if (alpha < 1) {
@@ -98,7 +122,6 @@ function animatePteros() {
 
 function animateRolls() {
     const floorRolls = document.getElementsByClassName('floor_roll');
-    console.log(floorRolls);
     for (let i = 0; i < floorRolls.length; i++) {
         const roll = floorRolls[i];
         let alpha = 0;
@@ -121,15 +144,12 @@ function animateRolls() {
 
 function checkCollisions() {
     const camera = document.getElementById('camera');
-    const cameraPositionAttr = camera.getAttribute('position');
-    const cameraPosition = typeof cameraPositionAttr === 'string' ? AFRAME.utils.coordinates.parse(cameraPositionAttr) : cameraPositionAttr;
+    const cameraPosition = getPos(camera);
     const obstacles = document.getElementsByClassName('obstacle');
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
-        const positionAttr = obstacle.getAttribute('position');
-        const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+        const position = getPos(obstacle);
         if (position.z > cameraPosition.z + 1 || position.z < cameraPosition.z - 1 || reload) continue;
-        // console.log(cameraPosition, position)
         type = obstacle.getAttribute('data-obstacle_type');
         if ((type === 'short_cactus' || type === 'pteranodon_l') && cameraPosition.y < 5) {
             alert('Game over!');
@@ -153,7 +173,7 @@ function spawnObstacleRandomly() {
     spawnObstacle();
     setTimeout(spawnObstacleRandomly, Math.floor(Math.random() * 1000) + 1500);
 }
-setTimeout(spawnObstacleRandomly, 1000);
+// setTimeout(spawnObstacleRandomly, 1000);
 
 
 function initializeFloors() {
@@ -161,11 +181,11 @@ function initializeFloors() {
     spawnFloor(false);
 }
 setTimeout(() => {
-    initializeFloors();
+    // initializeFloors();
 }, 500);
 
 setInterval(() => {
-    animatePteros();
+    // animatePteros();
 }, 400);
 
 animateRolls();
@@ -175,7 +195,8 @@ setInterval(() => {
 
 let lastSpawned = 0;
 setInterval(() => {
-    checkCollisions();
+    return;
+    // checkCollisions();
     if (reload) {
         location.reload();
         return;
@@ -185,8 +206,7 @@ setInterval(() => {
     let spawn = false;
     lastSpawned += 0.1;
     for (let i = 0; i < floors.length; i++) {
-        const positionAttr = floors[i].getAttribute('position');
-        const position = typeof positionAttr === 'string' ? AFRAME.utils.coordinates.parse(positionAttr) : positionAttr;
+        const position = getPos(floors[i]);
         floors[i].setAttribute('position', { x: 0, y: -1, z: position.z + 0.1 });
         if (Math.floor(position.z) === 0 && lastSpawned >= 2) {
             spawn = true;
