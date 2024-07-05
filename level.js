@@ -8,7 +8,7 @@ function getPos(object) {
 }
 
 const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_small_1', 'cactus_small_2', 'pteranodon', 'pteranodon', 'pteranodon']
-// const obstacle_names = ['cactus_small_1', 'cactus_small_2']
+// const obstacle_names = ['pteranodon', 'pteranodon', 'pteranodon']
 let reload = false;
 
 function spawnObstacle() {
@@ -28,7 +28,7 @@ function spawnObstacle() {
         }
     }
     else {
-        obstacle.setAttribute('position', { x: 0, y: -0.9, z: -50 });
+        obstacle.setAttribute('position', { x: 0, y: -0.9, z: -80 });
         obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
     }
 
@@ -68,18 +68,31 @@ function getPosX(posZ) {
     return posX;
 }
 
+function getRotation(diffX, diffZ) {
+    tan = diffX / diffZ;
+    // console.log(diffX, diffZ, tan)
+    return Math.atan(tan) * 180 / Math.PI;
+}
+
 function moveObstacles() {
     const obstacles = document.getElementsByClassName('obstacle');
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
+        oldZ = position.z;
+        oldX = position.x;
         obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + 0.1 });
         type = obstacle.getAttribute('data-obstacle_type');
+
         if (type === 'tall_cactus' || type === 'short_cactus') {
-            obstacles[i].setAttribute('position', { x: 0, y: getPosY(position.z + 0.1, type), z: position.z });
+            obstacle.setAttribute('position', { x: 0, y: getPosY(position.z + 0.1, type), z: position.z });
         }
         else if (type === 'pteranodon' || type === 'pteranodon_l') {
-            obstacles[i].setAttribute('position', { x: getPosX(position.z + 0.1), y: position.y, z: position.z });
+            obstacle.setAttribute('position', { x: getPosX(position.z + 0.1), y: position.y, z: position.z });
+            newPos = getPos(obstacle);
+            console.log(`New position: ${newPos.x}, ${newPos.z}`);
+            rotation = getRotation(newPos.x - oldX, newPos.z - oldZ);
+            obstacle.setAttribute('rotation', { x: 0, y: rotation, z: 0 });
         }
         if (position.z > 50) {
             obstacles[i].remove();
@@ -87,7 +100,7 @@ function moveObstacles() {
     }
 }
 
-function animatePteros() {
+function animatePteros(duration) {
     const pteranodons = document.getElementsByClassName('pteranodon');
     for (let i = 0; i < pteranodons.length; i++) {
         const pteranodon = pteranodons[i];
@@ -96,49 +109,52 @@ function animatePteros() {
         const rotationL = parseFloat(leftWing.getAttribute('rotation').z);
         const rotationR = parseFloat(rightWing.getAttribute('rotation').z);
         const targetRotation = Math.floor(rotationL) >= 9 ? -25 : 10;
-        let alpha = 0;
 
-        function animate() {
+        const startTime = performance.now();
+        function animate(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            const alpha = Math.min(elapsedTime / duration, 1);
+            leftWing.setAttribute('rotation', {
+                x: leftWing.getAttribute('rotation').x,
+                y: leftWing.getAttribute('rotation').y,
+                z: lerp(rotationL, targetRotation, alpha)
+            });
+            rightWing.setAttribute('rotation', {
+                x: rightWing.getAttribute('rotation').x,
+                y: rightWing.getAttribute('rotation').y,
+                z: lerp(rotationR, -targetRotation, alpha)
+            });
             if (alpha < 1) {
-                alpha += 0.03;
-                const newRotationL = lerp(rotationL, targetRotation, alpha);
-                leftWing.setAttribute('rotation', {
-                    x: leftWing.getAttribute('rotation').x,
-                    y: leftWing.getAttribute('rotation').y,
-                    z: newRotationL
-                });
-                const newRotationR = lerp(rotationR, -targetRotation, alpha);
-                rightWing.setAttribute('rotation', {
-                    x: rightWing.getAttribute('rotation').x,
-                    y: rightWing.getAttribute('rotation').y,
-                    z: newRotationR
-                });
                 requestAnimationFrame(animate);
             }
         }
-        animate();
+        requestAnimationFrame(animate);
     }
 }
 
 function animateRolls() {
     const floorRolls = document.getElementsByClassName('floor_roll');
+    const duration = 5000;
+
     for (let i = 0; i < floorRolls.length; i++) {
         const roll = floorRolls[i];
-        let alpha = 0;
+        const startTime = performance.now();
 
-        function animate() {
+        function animate(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            const alpha = Math.min(elapsedTime / duration, 1);
+            const newRotation = lerp(0, -360, alpha);
+            roll.setAttribute('rotation', {
+                x: newRotation,
+                y: roll.getAttribute('rotation').y,
+                z: roll.getAttribute('rotation').z
+            });
+
             if (alpha < 1) {
-                alpha += 0.0018;
-                const newRotation = lerp(0, -360, alpha);
-                roll.setAttribute('rotation', {
-                    x: newRotation,
-                    y: roll.getAttribute('rotation').y,
-                    z: roll.getAttribute('rotation').z
-                });
                 requestAnimationFrame(animate);
             }
         }
-        animate();
+        requestAnimationFrame(animate);
     }
 }
 
@@ -173,20 +189,19 @@ function spawnObstacleRandomly() {
     spawnObstacle();
     setTimeout(spawnObstacleRandomly, Math.floor(Math.random() * 1000) + 1500);
 }
-// setTimeout(spawnObstacleRandomly, 1000);
-
+setTimeout(spawnObstacleRandomly, 1000);
 
 function initializeFloors() {
     spawnFloor(true);
     spawnFloor(false);
 }
 setTimeout(() => {
-    // initializeFloors();
+    initializeFloors();
 }, 500);
 
 setInterval(() => {
-    // animatePteros();
-}, 400);
+    animatePteros(300);
+}, 300);
 
 animateRolls();
 setInterval(() => {
@@ -195,8 +210,8 @@ setInterval(() => {
 
 let lastSpawned = 0;
 setInterval(() => {
-    return;
-    // checkCollisions();
+    // return;
+    checkCollisions();
     if (reload) {
         location.reload();
         return;
