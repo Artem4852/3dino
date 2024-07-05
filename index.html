@@ -68,13 +68,31 @@
             position="0 11.6 50"></a-obj-model>
     </a-scene>
 
-    <div class="menu">
+    <div id="start" class="menu">
         <h1>Dino Dash 3D</h1>
-        <h2>Loading...</h2>
+        <h2 id="loading-text">Loading...</h2>
         <div id="loading-wrapper">
             <div id="loading-bar"></div>
         </div>
-        <button onclick="start()">Start</button>
+        <button id="start-button" onclick="start()">Start</button>
+    </div>
+
+    <div id="pause" class="menu">
+        <h1>Dino Dash 3D</h1>
+        <h2>Pause.</h2>
+        <button id="start-button" class="activeButton" onclick="unpause()">Continue</button>
+        <button id="start-button" class="activeButton" onclick="restart()">Restart</button>
+    </div>
+
+    <div id="lost" class="menu">
+        <h1>Dino Dash 3D</h1>
+        <h2>Womp womp. You lost...</h2>
+        <h2>Your score: <span id="score-menu">0</span></h2>
+        <button id="start-button" class="activeButton" onclick="restart()">Restart</button>
+    </div>
+
+    <div id="topbar">
+        <h2>Score <span id="score">0</span></h2>
     </div>
 
     <script>
@@ -89,23 +107,23 @@
         // });
 
         // The best way I could think of to get dimensions of the floor...
-        AFRAME.registerComponent('get-dimensions', {
-            init: function () {
-                this.el.addEventListener('model-loaded', () => {
-                    const mesh = this.el.getObject3D('mesh');
-                    if (mesh) {
-                        const box = new THREE.Box3().setFromObject(mesh);
-                        const size = box.getSize(new THREE.Vector3());
-                        console.log(this.el.getAttribute('src'));
+        // AFRAME.registerComponent('get-dimensions', {
+        //     init: function () {
+        //         this.el.addEventListener('model-loaded', () => {
+        //             const mesh = this.el.getObject3D('mesh');
+        //             if (mesh) {
+        //                 const box = new THREE.Box3().setFromObject(mesh);
+        //                 const size = box.getSize(new THREE.Vector3());
+        //                 console.log(this.el.getAttribute('src'));
 
-                        console.log('Dimensions:', size);
+        //                 console.log('Dimensions:', size);
 
-                        const position = this.el.object3D.position;
-                        const endX = position.x + size.x * this.el.object3D.scale.x / 2;
-                    }
-                });
-            }
-        });
+        //                 const position = this.el.object3D.position;
+        //                 const endX = position.x + size.x * this.el.object3D.scale.x / 2;
+        //             }
+        //         });
+        //     }
+        // });
     </script>
     <script src="camera.js"></script>
     <script src="level.js"></script>

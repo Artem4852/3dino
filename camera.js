@@ -65,8 +65,9 @@ let movingUp = true;
 let shiftPressed = false;
 let isJumping = false;
 setInterval(() => {
+    if (pause) return;
     checkCollisions();
-    if (isJumping || reload) return;
+    if (isJumping || lost) return;
 
     if (shiftPressed && camera.getAttribute('position').y > 1.3) {
         camera.setAttribute('position', '0 1 0');
@@ -85,10 +86,21 @@ setInterval(() => {
 }, 150);
 
 document.addEventListener('keydown', (e) => {
+    console.log(e.key)
     if (e.key === 'Shift') {
         shiftPressed = true;
     } else if (e.key === 'w' && !shiftPressed) {
         jump();
+    } else if (e.key === 'Escape') {
+        pause = !pause;
+        if (pause) {
+            document.getElementById('pause').style.display = 'flex';
+            document.getElementById('score').parentElement.style.display = 'none';
+        }
+        else {
+            document.getElementById('score').parentElement.style.display = 'block';
+            document.getElementById('pause').style.display = 'none';
+        }
     }
 });
 

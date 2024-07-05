@@ -1,3 +1,24 @@
+let score = 0;
+
+// Loading animation
+let i = 1;
+let loadingDone = false;
+let pause = true;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loadingText = document.getElementById('loading-text');
+    loadingText.innerHTML = 'Loading' + '.'.repeat(0);
+    
+    let loadingInterval = setInterval(() => {
+        loadingText.innerHTML = 'Loading' + '.'.repeat(i % 4);
+        i++;
+        if (!pause || loadingDone) {
+            loadingText.innerHTML = 'Everything ready!';
+            clearInterval(loadingInterval);
+        }
+    }, 500);
+});
+
 function lerp(start, end, alpha) {
     return start * (1 - alpha) + end * alpha;
 }
@@ -8,16 +29,32 @@ function getPos(object) {
 }
 
 const loadingBar = document.getElementById('loading-bar');
-let pause = true;
 
 function start() {
-    document.getElementsByClassName('menu')[0].style = 'display: none';
+    if (document.getElementById('start-button').getAttribute('class') !== 'activeButton') return;
+    document.getElementById('start').style.display = 'none';
+    document.getElementById('score').parentElement.style.display = 'block';
     pause = false;
+}
+
+function unpause() {
+    document.getElementById('pause').style.display = 'none';
+    document.getElementById('score').parentElement.style.display = 'block';
+    pause = false;
+}
+
+function restart() {
+    location.reload();
+}
+
+function updateScore() {
+    score++;
+    document.getElementById('score').innerHTML = score;
 }
 
 const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_small_1', 'cactus_small_2', 'pteranodon', 'pteranodon', 'pteranodon']
 // const obstacle_names = ['pteranodon', 'pteranodon', 'pteranodon']
-let reload = false;
+let lost = false;
 
 function createPool() {
     for (let i = 0; i < 30; i++) {
@@ -123,6 +160,7 @@ function moveObstacles() {
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
+        // console.log(obstacle);
         oldZ = position.z;
         oldX = position.x;
         obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + 0.1 });
@@ -209,64 +247,68 @@ function checkCollisions() {
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
-        if (position.z > cameraPosition.z + 1 || position.z < cameraPosition.z - 1 || reload) continue;
+        if (position.z > cameraPosition.z + 1 || position.z < cameraPosition.z - 1 || lost) continue;
         type = obstacle.getAttribute('data-obstacle_type');
         if ((type === 'short_cactus' || type === 'pteranodon_l') && cameraPosition.y < 5) {
-            alert('Game over!');
-            reload = true;
+            lost = true;
             return;
         }
         else if (type === 'tall_cactus' && cameraPosition.y < 8) {
-            alert('Game over!');
-            reload = true;
+            lost = true;
             return;
         }
         else if (type === 'pteranodon' && cameraPosition.y > 2) {
-            alert('Game over!');
-            reload = true;
+            lost = true;
             return;
         }
     }
 }
 
+// Initialization
 createPool()
-function activateObstacleRandomly() {
-    activateObstacle();
-    setTimeout(activateObstacleRandomly, Math.floor(Math.random() * 1000) + 1500);
-}
-setTimeout(activateObstacleRandomly, 2000);
-
-setTimeout(() => {
-    loadingBar.style = 'width: 40%';    
-}, 1000);
 
 function initializeFloors() {
-    spawnFloor(true);
-    loadingBar.style = 'width: 60%';
-    activateFloor();
+    setTimeout(() => {
+        loadingBar.style = 'width: 40%';
+        spawnFloor(true);
+    }, 500);
+    setTimeout(() => {
+        loadingBar.style = 'width: 60%';
+        activateFloor();
+    }, 1000);
+    setTimeout(() => {
+        loadingBar.style = 'width: 100%';
+        document.getElementById('start-button').setAttribute('class', 'activeButton');
+        loadingDone = true;
+    }, 1500);
 }
 setTimeout(() => {
+    activateObstacle();
     initializeFloors();
-    loadingBar.style = 'width: 100%';
-}, 2000);
-
-setInterval(() => {
-    animatePteros(300);
-}, 300);
-
-animateRolls();
-setInterval(() => {
-    animateRolls();
-}, 5000)
+}, 1500);
 
 let lastSpawned = 0;
+let obstacleTimer = Math.floor(Math.random() * 1000) + 1500;
 setInterval(() => {
     if (pause) return;
-    if (reload) {
-        location.reload();
+    if (lost) {
+        pause = true;
+        document.getElementById('lost').style.display = 'flex';
+        document.getElementById('score').parentElement.style.display = 'none';
+        document.getElementById('score-menu').innerHTML = Math.floor(score);
         return;
     }
-    moveObstacles();
+    score += 0.01;
+    document.getElementById('score').innerHTML = Math.floor(score);
+
+    // Spawning obstacles
+    obstacleTimer -= 10;
+    if (obstacleTimer <= 0) {
+        activateObstacle();
+        obstacleTimer = Math.floor(Math.random() * 1000) + 1500;
+    }
+
+    // Moving floors
     floors = document.getElementsByClassName('floor_active');
     let spawn = false;
     lastSpawned += 0.1;
@@ -280,8 +322,22 @@ setInterval(() => {
             deactivateFloor(floors[i]);
         }
     }
+
+    // Spawning floors
     if (spawn) {
         activateFloor();
     }
-    return;
+
+    // Moving obstacles
+    moveObstacles();
 }, 10);
+
+// Animations
+setInterval(() => {
+    animatePteros(300);
+}, 300);
+
+animateRolls();
+setInterval(() => {
+    animateRolls();
+}, 5000)
