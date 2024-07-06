@@ -9,7 +9,7 @@
 </head>
 <body>
     <a-scene id="scene">
-        <a-assets data-total-assets="26">
+        <a-assets timeout="10000">
             <a-asset-item id="cactus_small_1_obj" src="assets/cactus_small_1.obj"></a-asset-item>
             <a-asset-item id="cactus_small_1_mtl" src="assets/cactus_small_1.mtl"></a-asset-item>
             <a-asset-item id="cactus_small_2_obj" src="assets/cactus_small_2.obj"></a-asset-item>
@@ -146,6 +146,15 @@
         //         });
         //     }
         // });
+
+        AFRAME.registerComponent('wait-for-loading', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('loaded', function () {
+                    startExperience();
+                });
+            }
+        });
     </script>
     <script src="camera.js"></script>
     <script src="level.js"></script>

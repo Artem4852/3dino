@@ -100,7 +100,7 @@ function createPool() {
 
 function spawnObstacle(index = 0) {
     return new Promise((resolve) => {
-        console.log("Spawning obstacle", index)
+        console.log(performance.now(), "Spawning obstacle", index)
         choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
         const obstacle = document.getElementById(choice).cloneNode(true);
         obstacle.removeAttribute('id');
@@ -130,7 +130,7 @@ function spawnObstacle(index = 0) {
 
 function activateObstacle() {
     inactive = document.getElementsByClassName('inactive');
-    console.log(inactive.length)
+    console.log(performance.now(), inactive.length)
     obstacle = inactive[Math.floor(Math.random() * inactive.length)];
     obstacle.setAttribute('class', obstacle.getAttribute('class').replace('inactive', 'active'));
 }
@@ -143,7 +143,7 @@ function deactivateObstacle(obstacle) {
 
 function spawnFloor(origin = false, index = 0) {
     return new Promise((resolve) => {
-        console.log("Spawning floor", index)
+        console.log(performance.now(), "Spawning floor", index)
         const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3) + 1)).cloneNode(true);
         floor.removeAttribute('id');
         floor.setAttribute('class', origin ? 'floor_active' : 'floor_inactive');
@@ -200,7 +200,7 @@ function getPosX(posZ) {
 
 function getRotation(diffX, diffZ) {
     tan = diffX / diffZ;
-    // console.log(diffX, diffZ, tan)
+    // console.log(performance.now(), diffX, diffZ, tan)
     return Math.atan(tan) * 180 / Math.PI;
 }
 
@@ -209,7 +209,7 @@ function moveObstacles() {
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
-        // console.log(obstacle);
+        // console.log(performance.now(), obstacle);
         oldZ = position.z;
         oldX = position.x;
         obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + speed });
@@ -221,7 +221,7 @@ function moveObstacles() {
         else if (type === 'pteranodon' || type === 'pteranodon_l') {
             obstacle.setAttribute('position', { x: getPosX(position.z + 0.1), y: position.y, z: position.z });
             newPos = getPos(obstacle);
-            // console.log(`New position: ${newPos.x}, ${newPos.z}`);
+            // console.log(performance.now(), `New position: ${newPos.x}, ${newPos.z}`);
             rotation = getRotation(newPos.x - oldX, newPos.z - oldZ);
             obstacle.setAttribute('rotation', { x: 0, y: rotation, z: 0 });
         }
@@ -314,16 +314,16 @@ function checkCollisions() {
 }
 
 assetLoader.addEventListener('loaded', function () {
-    console.log('All assets have been loaded.');
+    console.log(performance.now(), 'All assets have been loaded.');
     initializeGame();
 });
 
 // Initialization
 async function initializeGame() {
     await createPool();
-    console.log("Activating obstacles")
+    console.log(performance.now(), "Activating obstacles")
     activateObstacle();
-    console.log("Activating floors")
+    console.log(performance.now(), "Activating floors")
     initializeFloors();
     loadingDone = true;
 }
