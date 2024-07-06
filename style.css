@@ -62,10 +62,24 @@ button.activeButton {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 9999;
+}
+.menu .controls {
+  margin-top: 30px;
+  width: 400px;
+}
+.menu .controls h2 {
+  margin-bottom: 10px;
+}
+.menu .controls h3 {
+  margin-top: 0px;
 }
 
 #topbar {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   width: 100%;
   padding: 10px 30px;
   color: #000;

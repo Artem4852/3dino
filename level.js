@@ -5,7 +5,23 @@ let i = 1;
 let loadingDone = false;
 let pause = true;
 let speed = 0.1;
+let assetsLoaded = 0;
 const assetLoader = document.querySelector('a-assets');
+const totalAssets = parseInt(assetLoader.getAttribute('data-total-assets'));
+
+function updateLoadingProgress() {
+    assetsLoaded++;
+    if (assetsLoaded === totalAssets) {
+        initializeGame();
+    }
+}
+
+function enableStartButton() {
+    loadingBar.style = 'width: 100%';
+    document.getElementById('start-button').setAttribute('class', 'activeButton');
+}
+
+assetLoader.addEventListener('asset-loaded', updateLoadingProgress);
 
 document.addEventListener('DOMContentLoaded', () => {
     const loadingText = document.getElementById('loading-text');
@@ -16,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         i++;
         if (!pause || loadingDone) {
             loadingText.innerHTML = 'Everything ready!';
+            enableStartButton();
             clearInterval(loadingInterval);
         }
     }, 500);
@@ -59,43 +76,55 @@ const obstacle_names = ['cactus_big_1', 'cactus_big_2', 'cactus_big_3', 'cactus_
 let lost = false;
 
 function createPool() {
-    for (let i = 0; i < 30; i++) {
-        spawnObstacle();
-    }
-    for (let i = 0; i < 10; i++) {
-        spawnFloor();
-    }
+    return new Promise((resolve) => {
+        let obstaclePromises = [];
+        for (let i = 0; i < 30; i++) {
+            obstaclePromises.push(spawnObstacle(i));
+        }
+        let floorPromises = [];
+        for (let i = 0; i < 10; i++) {
+            floorPromises.push(spawnFloor(index = i));
+        }
+        return Promise.all([...obstaclePromises, ...floorPromises]).then(() => {
+            resolve();
+        });
+    });
 }
 
-function spawnObstacle() {
-    choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
-    const obstacle = document.getElementById(choice).cloneNode(true);
-    obstacle.removeAttribute('id');
-    obstacle.setAttribute('class', 'obstacle inactive');
-    obstacle.setAttribute('visible', 'true')
+function spawnObstacle(index = 0) {
+    return new Promise((resolve) => {
+        console.log("Spawning obstacle", index)
+        loadingBar.style = `width: ${index * 2}%`;
+        choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
+        const obstacle = document.getElementById(choice).cloneNode(true);
+        obstacle.removeAttribute('id');
+        obstacle.setAttribute('class', 'obstacle inactive');
+        obstacle.setAttribute('visible', 'true')
 
-    if (choice === 'pteranodon') {
-        obstacle.setAttribute('class', 'obstacle inactive pteranodon');
-        if (Math.random() > 0.5) {
-            obstacle.setAttribute('data-obstacle_type', 'pteranodon_l');
-            obstacle.setAttribute('position', { x: 0, y: 1, z: -80 });
+        if (choice === 'pteranodon') {
+            obstacle.setAttribute('class', 'obstacle inactive pteranodon');
+            if (Math.random() > 0.5) {
+                obstacle.setAttribute('data-obstacle_type', 'pteranodon_l');
+                obstacle.setAttribute('position', { x: 0, y: 1, z: -80 });
+            }
+            else {
+                obstacle.setAttribute('position', { x: 0, y: 4, z: -80 });
+            }
         }
         else {
-            obstacle.setAttribute('position', { x: 0, y: 4, z: -80 });
+            obstacle.setAttribute('position', { x: 0, y: -0.9, z: -80 });
+            obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
         }
-    }
-    else {
-        obstacle.setAttribute('position', { x: 0, y: -0.9, z: -80 });
-        obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
-    }
 
-    document.getElementById('scene').appendChild(obstacle);
+        document.getElementById('scene').appendChild(obstacle);
+        resolve();
+    });
 }
 
 function activateObstacle() {
     inactive = document.getElementsByClassName('inactive');
+    console.log(inactive.length)
     obstacle = inactive[Math.floor(Math.random() * inactive.length)];
-    // console.log(obstacle.getAttribute('class'));
     obstacle.setAttribute('class', obstacle.getAttribute('class').replace('inactive', 'active'));
 }
 
@@ -105,15 +134,20 @@ function deactivateObstacle(obstacle) {
     obstacle.setAttribute('class', obstacle.getAttribute('class').replace('active', 'inactive'));
 }
 
-function spawnFloor(origin = false) {
-    const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3)+1)).cloneNode(true);
-    floor.removeAttribute('id');
-    floor.setAttribute('class', origin ? 'floor_active' : 'floor_inactive');
-    floor.setAttribute('visible', 'true')
+function spawnFloor(origin = false, index = 0) {
+    return new Promise((resolve) => {
+        console.log("Spawning floor", index)
+        loadingBar.style = `width: ${60 + (index * 4)}%`;
+        const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3) + 1)).cloneNode(true);
+        floor.removeAttribute('id');
+        floor.setAttribute('class', origin ? 'floor_active' : 'floor_inactive');
+        floor.setAttribute('visible', 'true')
 
-    floor.setAttribute('position', {x: 0, y: -1, z: origin ? 0 : -100});
+        floor.setAttribute('position', { x: 0, y: -1, z: origin ? 0 : -100 });
 
-    document.getElementById('scene').appendChild(floor);
+        document.getElementById('scene').appendChild(floor);
+        resolve();
+    });
 }
 
 function activateFloor() {
@@ -255,7 +289,7 @@ function checkCollisions() {
     for (let i = 0; i < obstacles.length; i++) {
         const obstacle = obstacles[i];
         const position = getPos(obstacle);
-        if (position.z > cameraPosition.z + 1 || position.z < cameraPosition.z - 1 || lost) continue;
+        if (position.z > cameraPosition.z + 2 || position.z < cameraPosition.z - 2 || lost) continue;
         type = obstacle.getAttribute('data-obstacle_type');
         if ((type === 'short_cactus' || type === 'pteranodon_l') && cameraPosition.y < 5) {
             lost = true;
@@ -274,33 +308,22 @@ function checkCollisions() {
 
 assetLoader.addEventListener('loaded', function () {
     console.log('All assets have been loaded.');
-    assetsLoaded = true;
     initializeGame();
 });
 
 // Initialization
-function initializeGame() {
-    createPool();
-    setTimeout(() => {
-        activateObstacle();
-        initializeFloors();
-    }, 1500);
+async function initializeGame() {
+    await createPool();
+    console.log("Activating obstacles")
+    activateObstacle();
+    console.log("Activating floors")
+    initializeFloors();
+    loadingDone = true;
 }
 
 function initializeFloors() {
-    setTimeout(() => {
-        loadingBar.style = 'width: 40%';
-        spawnFloor(true);
-    }, 500);
-    setTimeout(() => {
-        loadingBar.style = 'width: 60%';
-        activateFloor();
-    }, 1000);
-    setTimeout(() => {
-        loadingBar.style = 'width: 100%';
-        document.getElementById('start-button').setAttribute('class', 'activeButton');
-        loadingDone = true;
-    }, 1500);
+    spawnFloor(true);
+    activateFloor();
 }
 
 let lastSpawned = 0;
