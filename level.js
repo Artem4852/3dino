@@ -377,7 +377,7 @@ setInterval(() => {
 
     // Moving obstacles
     moveObstacles();
-}, 15);
+}, 10);
 
 // Animations
 setInterval(() => {
