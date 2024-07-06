@@ -13,14 +13,14 @@ Dino Dash 3D transforms the traditional 2D side-scrolling game into an immersive
 
 ## Live demo
 
-The webpage is hosted on GitHub Pages. Check it out here - https://artem4852.github.io/3dino/
+The webpage is hosted on GitHub Pages. Check it out here - https://artem4852.github.io/3dino/. First time you load it would be clunky, but after you lost and restart it should be smooth.
 
 ## Features
 
 - 3D graphics powered by A-Frame
 - Procedurally generated obstacles (cacti and pteranodons)
 - Dynamic difficulty increase as the game progresses
-- Responsive design for both desktop and mobile
+- Responsive design for both desktop and mobile (while it works on mobile, it's not optimized very well for it)
 - Score tracking
 
 ## Getting Started
