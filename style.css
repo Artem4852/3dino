@@ -72,7 +72,7 @@ button.activeButton {
 .menu * {
   max-width: 95vw;
 }
-.menu h3 {
+.menu h3#achnowledgement {
   margin-bottom: 50px;
 }
 .menu .controls {

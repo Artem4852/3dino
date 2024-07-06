@@ -29,7 +29,6 @@ function jump() {
 
     const gravity = -40;
     const initialVelocity = 24;
-
     let startTime = performance.now();
     const startPosition = parseFloat(camera.getAttribute('position').y);
 
