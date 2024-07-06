@@ -13,7 +13,7 @@ Dino Dash 3D transforms the traditional 2D side-scrolling game into an immersive
 
 ## Live demo
 
-The webpage is hosted on GitHub Pages. Check it out here - https://artem4852.github.io/3dino/. First time you load it would be clunky, but after you lost and restart it should be smooth.
+The webpage is hosted on GitHub Pages. Check it out here - https://artem4852.github.io/3dino/. First time you load it would be clunky, but after you lose and restart it should be smooth.
 
 ## Features
 
