@@ -87,7 +87,7 @@ setInterval(() => {
 
 // For desktop devices
 document.addEventListener('keydown', (e) => {
-    console.log(e.key);
+    // console.log(e.key);
     if (e.key === 'c') {
         shiftPressed = true;
     } else if (e.key === 'w' && !shiftPressed) {

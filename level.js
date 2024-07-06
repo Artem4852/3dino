@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         i++;
         if (!pause || loadingDone) {
             loadingText.innerHTML = 'Everything ready!';
-            loadingBar.style.width = '100%'
             enableStartButton();
             clearInterval(loadingInterval);
         }
@@ -124,7 +123,6 @@ function spawnObstacle(index = 0) {
 
         obstacle.addEventListener('loaded', () => resolve(obstacle));
         document.getElementById('scene').appendChild(obstacle);
-        loadingBar.style.width = `${index * 2}%`;
     });
 }
 
@@ -153,7 +151,6 @@ function spawnFloor(origin = false, index = 0) {
 
         floor.addEventListener('loaded', () => resolve(floor));
         document.getElementById('scene').appendChild(floor);
-        loadingBar.style.width = `${60 + (index * 4)}%`;
     });
 }
 
@@ -312,6 +309,14 @@ function checkCollisions() {
         }
     }
 }
+
+assets = document.querySelectorAll('a-asset-item');
+for (let i = 0; i < assets.length; i++) {
+    assets[i].addEventListener('loaded', () => {
+        loadingBar.style = `width: ${Math.floor(assetsLoaded / totalAssets * 100)}%`;
+        console.log(performance.now(), 'Asset loaded:', assets[i].getAttribute('src'));
+    });
+};
 
 assetLoader.addEventListener('loaded', function () {
     console.log(performance.now(), 'All assets have been loaded.');
