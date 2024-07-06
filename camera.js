@@ -87,7 +87,7 @@ setInterval(() => {
 
 // For desktop devices
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Shift') {
+    if (e.key === 'c') {
         shiftPressed = true;
     } else if (e.key === 'w' && !shiftPressed) {
         jump();
@@ -105,7 +105,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 document.addEventListener('keyup', (e) => {
-    if (e.key === 'Shift') {
+    if (e.key === 'c') {
         shiftPressed = false;
     }
 });
