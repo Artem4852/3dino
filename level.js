@@ -4,6 +4,8 @@ let score = 0;
 let i = 1;
 let loadingDone = false;
 let pause = true;
+let speed = 0.1;
+const assetLoader = document.querySelector('a-assets');
 
 document.addEventListener('DOMContentLoaded', () => {
     const loadingText = document.getElementById('loading-text');
@@ -142,10 +144,16 @@ function getPosY(posZ, type) {
 }
 
 function getPosX(posZ) {
-    if (posZ <= 20 && posZ >= -20) return 0;
-    offset = posZ < 0 ? -50 : 50;
-    posX = 0.33 * -Math.sqrt(Math.pow(30, 2) - Math.pow((posZ - offset), 2));
-    // if (posX === NaN) console.log(posZ, offset);
+    offset = posZ < 0 ? -25 : 25;
+    coefficient = posZ < 0 ? -0.5 : 0.5;
+    // Formula: L / (1 + ℯ^(-(k (x - 25))))
+    posX = 10 / (1 + Math.exp(-coefficient * (posZ - offset)));
+    // posX = 0.5 * Math.sqrt(Math.pow(10, 2) - Math.pow((posZ - offset), 2)) - 5;
+    if (posZ <= 40 && posZ >= -40) return posX;
+
+    offset = posZ < 0 ? -75 : 75;
+    coefficient = posZ < 0 ? 0.5 : -0.5;
+    posX = 10 / (1 + Math.exp(-coefficient * (posZ - offset)));
     return posX;
 }
 
@@ -163,7 +171,7 @@ function moveObstacles() {
         // console.log(obstacle);
         oldZ = position.z;
         oldX = position.x;
-        obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + 0.1 });
+        obstacle.setAttribute('position', { x: 0, y: position.y, z: position.z + speed });
         type = obstacle.getAttribute('data-obstacle_type');
 
         if (type === 'tall_cactus' || type === 'short_cactus') {
@@ -264,8 +272,20 @@ function checkCollisions() {
     }
 }
 
+assetLoader.addEventListener('loaded', function () {
+    console.log('All assets have been loaded.');
+    assetsLoaded = true;
+    initializeGame();
+});
+
 // Initialization
-createPool()
+function initializeGame() {
+    createPool();
+    setTimeout(() => {
+        activateObstacle();
+        initializeFloors();
+    }, 1500);
+}
 
 function initializeFloors() {
     setTimeout(() => {
@@ -282,10 +302,6 @@ function initializeFloors() {
         loadingDone = true;
     }, 1500);
 }
-setTimeout(() => {
-    activateObstacle();
-    initializeFloors();
-}, 1500);
 
 let lastSpawned = 0;
 let obstacleTimer = Math.floor(Math.random() * 1000) + 1500;
@@ -300,6 +316,7 @@ setInterval(() => {
     }
     score += 0.01;
     document.getElementById('score').innerHTML = Math.floor(score);
+    if (score % 30 === 0) speed += 0.01;
 
     // Spawning obstacles
     obstacleTimer -= 10;

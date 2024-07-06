@@ -27,15 +27,15 @@ function jump() {
     if (isJumping) return;
     isJumping = true;
 
-    const gravity = -9.8;
-    const initialVelocity = 12;
-    const frameDuration = 1 / 60;
+    const gravity = -40;
+    const initialVelocity = 24;
 
-    let time = 0;
+    let startTime = performance.now();
     const startPosition = parseFloat(camera.getAttribute('position').y);
 
-    function animateJump() {
-        time += frameDuration;
+    function animateJump(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const time = (timestamp - startTime) / 1000;
 
         let newPosition = startPosition + initialVelocity * time + 0.5 * gravity * time * time;
 
@@ -85,6 +85,7 @@ setInterval(() => {
     movingUp = !movingUp;
 }, 150);
 
+// For desktop devices
 document.addEventListener('keydown', (e) => {
     console.log(e.key)
     if (e.key === 'Shift') {
@@ -108,4 +109,31 @@ document.addEventListener('keyup', (e) => {
     if (e.key === 'Shift') {
         shiftPressed = false;
     }
+});
+
+// For mobile devices
+let touchStartY = 0;
+const swipeThreshold = 50;
+
+document.addEventListener('touchstart', (e) => {
+    // shiftPressed = true;
+    touchStartY = e.touches[0].clientY;
+});
+
+document.addEventListener('touchend', (e) => {
+    // shiftPressed = false;
+    const touchEndY = e.changedTouches[0].clientY;
+    const swipeDistance = touchStartY - touchEndY;
+    
+    if (swipeDistance > swipeThreshold) {
+        if (shiftPressed) shiftPressed = false;
+        else jump();
+    }
+    else if (swipeDistance < -swipeThreshold) {
+        shiftPressed = !shiftPressed;
+    }
+});
+
+document.addEventListener('touchcancel', () => {
+    shiftPressed = !shiftPressed;
 });
