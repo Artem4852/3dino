@@ -5,23 +5,13 @@ let i = 1;
 let loadingDone = false;
 let pause = true;
 let speed = 0.1;
-let assetsLoaded = 0;
 const assetLoader = document.querySelector('a-assets');
 const totalAssets = parseInt(assetLoader.getAttribute('data-total-assets'));
-
-function updateLoadingProgress() {
-    assetsLoaded++;
-    if (assetsLoaded === totalAssets) {
-        initializeGame();
-    }
-}
 
 function enableStartButton() {
     loadingBar.style = 'width: 100%';
     document.getElementById('start-button').setAttribute('class', 'activeButton');
 }
-
-assetLoader.addEventListener('asset-loaded', updateLoadingProgress);
 
 document.addEventListener('DOMContentLoaded', () => {
     const loadingText = document.getElementById('loading-text');
@@ -310,10 +300,12 @@ function checkCollisions() {
     }
 }
 
+let assetsLoaded = 0;
 assets = document.querySelectorAll('a-asset-item');
 for (let i = 0; i < assets.length; i++) {
     assets[i].addEventListener('loaded', () => {
-        loadingBar.style = `width: ${Math.floor(assetsLoaded / totalAssets * 100)}%`;
+        assetsLoaded++;
+        loadingBar.style = `width: ${Math.floor(assetsLoaded / (assets.length+1) * 100)}%`;
         console.log(performance.now(), 'Asset loaded:', assets[i].getAttribute('src'));
     });
 };
