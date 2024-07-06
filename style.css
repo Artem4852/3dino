@@ -2,6 +2,8 @@
 * {
   font-family: "Tiny5", sans-serif;
   font-weight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -11,10 +13,12 @@ body {
 
 h1 {
   font-size: 60px;
+  margin-bottom: 50px;
 }
 
 h2 {
   font-size: 40px;
+  margin-bottom: 10px;
 }
 
 #loading-wrapper {
@@ -52,6 +56,7 @@ button.activeButton {
 }
 
 .menu {
+  padding: 50px 10px;
   width: 100%;
   height: 100%;
   background-color: #f0f0f0;
@@ -66,7 +71,8 @@ button.activeButton {
 }
 .menu .controls {
   margin-top: 30px;
-  width: 400px;
+  margin-bottom: 20px;
+  width: 350px;
 }
 .menu .controls h2 {
   margin-bottom: 10px;
@@ -81,15 +87,32 @@ button.activeButton {
   -moz-user-select: none;
   -ms-user-select: none;
   width: 100%;
-  padding: 10px 30px;
+  height: 35px;
+  padding: 30px;
   color: #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1000;
 }
 #topbar h2 {
+  height: 100%;
   display: none;
+}
+#topbar #pause-button {
+  background: none;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+}
+#topbar #pause-button div {
+  width: 8px;
+  height: 35px;
+  background-color: #000;
+  margin-right: 8px;
 }
 
 #pause {
@@ -98,6 +121,12 @@ button.activeButton {
 
 #lost {
   display: none;
+}
+
+@media (max-width: 500px) {
+  #controls-desktop {
+    display: none;
+  }
 }
 
 /*# sourceMappingURL=style.css.map */

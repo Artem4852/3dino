@@ -75,7 +75,7 @@
             <div id="loading-bar"></div>
         </div>
         <button id="start-button" onclick="start()">Start</button>
-        <div class="controls">
+        <div class="controls" id="controls-desktop">
             <h2>Controls (desktop):</h2>
             <h3>Jump: W</h3>
             <h3>Crouch: Shift</h3> 
@@ -112,7 +112,11 @@
     </div>
 
     <div id="topbar">
-        <h2>Score <span id="score">0</span></h2>
+        <h2>Score: <span id="score">0</span></h2>
+        <button id="pause-button" onclick="pauseGame()">
+            <div class="vertical"></div>
+            <div class="vertical"></div>
+        </button>
     </div>
 
     <script>

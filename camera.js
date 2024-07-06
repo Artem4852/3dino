@@ -98,7 +98,7 @@ document.addEventListener('keydown', (e) => {
             document.getElementById('score').parentElement.style.display = 'none';
         }
         else {
-            document.getElementById('score').parentElement.style.display = 'block';
+            document.getElementById('score').parentElement.style.display = 'flex';
             document.getElementById('pause').style.display = 'none';
         }
     }

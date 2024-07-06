@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         i++;
         if (!pause || loadingDone) {
             loadingText.innerHTML = 'Everything ready!';
+            loadingBar.style.width = '100%'
             enableStartButton();
             clearInterval(loadingInterval);
         }
@@ -52,13 +53,19 @@ const loadingBar = document.getElementById('loading-bar');
 function start() {
     if (document.getElementById('start-button').getAttribute('class') !== 'activeButton') return;
     document.getElementById('start').style.display = 'none';
-    document.getElementById('score').parentElement.style.display = 'block';
+    document.getElementById('score').parentElement.style.display = 'flex';
     pause = false;
+}
+
+function pauseGame() {
+    document.getElementById('pause').style.display = 'flex';
+    document.getElementById('score').parentElement.style.display = 'none';
+    pause = true;
 }
 
 function unpause() {
     document.getElementById('pause').style.display = 'none';
-    document.getElementById('score').parentElement.style.display = 'block';
+    document.getElementById('score').parentElement.style.display = 'flex';
     pause = false;
 }
 
@@ -94,7 +101,6 @@ function createPool() {
 function spawnObstacle(index = 0) {
     return new Promise((resolve) => {
         console.log("Spawning obstacle", index)
-        loadingBar.style = `width: ${index * 2}%`;
         choice = obstacle_names[Math.floor(Math.random() * obstacle_names.length)]
         const obstacle = document.getElementById(choice).cloneNode(true);
         obstacle.removeAttribute('id');
@@ -116,8 +122,9 @@ function spawnObstacle(index = 0) {
             obstacle.setAttribute('rotation', { x: 0, y: Math.random() * 360, z: 0 });
         }
 
+        obstacle.addEventListener('loaded', () => resolve(obstacle));
         document.getElementById('scene').appendChild(obstacle);
-        resolve();
+        loadingBar.style.width = `${index * 2}%`;
     });
 }
 
@@ -137,7 +144,6 @@ function deactivateObstacle(obstacle) {
 function spawnFloor(origin = false, index = 0) {
     return new Promise((resolve) => {
         console.log("Spawning floor", index)
-        loadingBar.style = `width: ${60 + (index * 4)}%`;
         const floor = document.getElementById('floor_' + (Math.floor(Math.random() * 3) + 1)).cloneNode(true);
         floor.removeAttribute('id');
         floor.setAttribute('class', origin ? 'floor_active' : 'floor_inactive');
@@ -145,8 +151,9 @@ function spawnFloor(origin = false, index = 0) {
 
         floor.setAttribute('position', { x: 0, y: -1, z: origin ? 0 : -100 });
 
+        floor.addEventListener('loaded', () => resolve(floor));
         document.getElementById('scene').appendChild(floor);
-        resolve();
+        loadingBar.style.width = `${60 + (index * 4)}%`;
     });
 }
 
