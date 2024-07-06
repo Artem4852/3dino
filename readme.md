@@ -13,7 +13,7 @@ Dino Dash 3D transforms the traditional 2D side-scrolling game into an immersive
 
 ## Live demo
 
-The webpage is hosted on netlify. Check it out here -
+The webpage is hosted on GitHub Pages. Check it out here - https://artem4852.github.io/3dino/
 
 ## Features
 
@@ -29,11 +29,11 @@ The webpage is hosted on netlify. Check it out here -
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/dino-dash-3d.git
+   git clone https://github.com/artem4852/3dino.git
    ```
 2. Navigate to the project directory:
    ```
-   cd dino-dash-3d
+   cd 3dino
    ```
 3. Open `index.html` in your web browser.
 
@@ -42,7 +42,7 @@ The webpage is hosted on netlify. Check it out here -
 ### Desktop Controls
 
 - Jump: W key
-- Crouch: Shift key
+- Crouch: C key
 - Pause: Esc key
 
 ### Mobile Controls
